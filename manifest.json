@@ -1,0 +1,29 @@
+{
+  "name": "MyApp PWA",
+  "short_name": "MyApp PWA",
+  "icons": [{
+    "src": "images/myapp.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    }, {
+      "src": "images/myapp.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    }, {
+      "src": "images/myapp.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    }, {
+      "src": "images/myapp.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }, {
+      "src": "images/myapp.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    }],
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#E6E6E6",
+  "theme_color": "#E6E6E6"
+}
