@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Bungee');
 @import url('https://fonts.googleapis.com/css?family=Ramabhadra');
-
 *{
     font-family: 'Ramabhadra', sans-serif;
 }
@@ -8,7 +7,6 @@
     margin-bottom: 0;
     border-radius: 0;
 }
-
 footer {
     background-color: black;
     padding: 25px;
@@ -28,14 +26,12 @@ footer {
     color:#585858 !important; 
     text-decoration: none;
 }
-
 .right{
 float: right;
 }
 .leerMas{
     height: 13px;
-    float: left;
-    
+    float: left;  
 }
 .noticia1{
     float: left;
@@ -44,7 +40,6 @@ float: right;
   /*border: 1px black solid;*/
    display: inline-block;
 }
-
 .fb-share-button{
     clear: left;
     float:left;

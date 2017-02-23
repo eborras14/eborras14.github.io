@@ -1,3 +1,4 @@
+//Assignamos la clave publica del servidor de mensajes push
 const applicationServerPublicKey = 'BO9nv0PGMD_vu1tzUFZ0OMzurn0o378vOYIRmjezBoYhQcb0CFsb_5jZc4bbhLHA1dNBeB-eee0SAKiuYJvBA2g';
 
 const pushButton = document.querySelector('.js-push-btn');
@@ -19,7 +20,7 @@ function urlB64ToUint8Array(base64String) {
   }  
   return outputArray;
 }
-
+//Comprobamos que el navegador soporta los mensajes push y los ServiceWorker
 if ('serviceWorker' in navigator && 'PushManager' in window) {
   console.log('Service Worker and Push is supported');
 
@@ -36,6 +37,8 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
   console.warn('Push messaging is not supported');
   pushButton.textContent = 'Push Not Supported';
 }
+//Añadimos un escuchador al boton para que cuando haga click salte la alerta de permitir las notificaciones
+//dentro de la pagina
 function initialiseUI() {
   pushButton.addEventListener('click', function() {
     pushButton.disabled = true;
@@ -52,7 +55,7 @@ function initialiseUI() {
     isSubscribed = !(subscription === null);
 
     updateSubscriptionOnServer(subscription);
-
+    
     if (isSubscribed) {
       console.log('User IS subscribed.');
     } else {

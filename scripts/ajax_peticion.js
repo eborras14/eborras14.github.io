@@ -1,32 +1,25 @@
-//Service Worker y mensajes push
-/*if ('serviceWorker' in navigator) {
-navigator.serviceWorker.register('/service-worker.js').then(function(reg) {
-  console.log('◕‿◕', reg);
-}, function(err) {
-  console.log('ಠ_ಠ', err);
-})
-}*/
-//var aleatorio = Math.round(Math.random()*50);
-//POOOPUUPP Y COOKIE
 comprovarPop();
+//Comprobación si hay cookie creada, para saber si es la primera vez que entras
 function comprovarPop(){
     var x=document.cookie;
     if(x==""){
         muestraPop();
     }
 }
+//Crea la cookie si no esta creada
 function crearCookie(){
     var x=document.cookie = "visita=1; expires=Thu, 18 Dec 2050 12:00:00 UTC;path=/";
 }
+//Muestra el pop-up de configuracion de la pagina
 function muestraPop(){
    $(window).load(function(){
         $('#myModal').modal('show');
     });
 }
-// Hacer peticion y obtener el XML---------------------------
+//Arrays para las secciones de la pantalla principal
 var div = ["Sucesos", "Internacional", "Politica","Economia","Deportes"];
 var ids = ["suc","int","pol","eco","dep"];
-
+//Hace la petición a la URL pasada por parametro
 function descargaArchivo(id,url,e) {
 if(window.XMLHttpRequest) {
      peticionHttp = new XMLHttpRequest();
@@ -45,6 +38,7 @@ if(window.XMLHttpRequest) {
         }
     }    
 }
+//Recoge los valores del XML y crea objetos noticia añadiendolos a un array
 function procesaContenido (seccion,documentoXml,id,e){
    var root = documentoXml.getElementsByTagName("channel")[0];
     var tope = root.getElementsByTagName("item").length;
@@ -84,6 +78,7 @@ function procesaContenido (seccion,documentoXml,id,e){
            refreshHTML(seccion,noticiaAGuardar); 
         }
 }
+//Gestiona los botones de actualizar y de eliminar las noticias principales en index.html
 function gestionaNoticias(sec,opc){
    if(opc==1){
     if(sec=="Sucesos"){
@@ -116,6 +111,7 @@ function gestionaNoticias(sec,opc){
       $( location ).attr("href", url);
    }  
 }
+//Printa toda la informacion almacenada en los objetos y las formata en HTML
 function muestraHTML(seccion, contentList){
     var o = "pp";
     if (seccion != null && seccion.length != 0 && contentList != null && contentList.length != 0) {
@@ -148,10 +144,11 @@ function refreshHTML(seccion,contentList){
             }
             $( location ).attr("href", "index.html");
 }
+//Redirecciona a la pagina que le pases por parametro
 function principal(url){
     $( location ).attr("href", url);
 }        
-
+// Notificaciones
 document.addEventListener('DOMContentLoaded', function () {
   if (Notification.permission !== "granted")
     Notification.requestPermission();
@@ -174,6 +171,7 @@ function welcome(mensaje) {
     };  
   }
 }
+//Funcion generalizada para los errores.
 function error(seccion){
     var muestraNoticia = localStorage.getItem(seccion);
     if(muestraNoticia != null && muestraNoticia.length != 0){

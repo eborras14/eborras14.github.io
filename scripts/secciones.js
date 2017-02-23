@@ -1,8 +1,10 @@
+//Arrays para localstorage
 var div = ["Sucesos", "Internacional", "Politica","Economia","Deportes"];
 var cache = ["Sucesos1", "Internacional1", "Politica1","Economia1","Deportes1"];
 var seccionFavorite = ["suc","inte","pol","","dep"];
 var matFavoritas = [];
 var contador = 0;
+//Carga de cada una de las secciones de la pagina
 function general(seccion){
 status = navigator.onLine;
     if(status=="true"){
@@ -29,6 +31,7 @@ status = navigator.onLine;
         }  
     }
 }
+//Obtiene el documento y lo descarga
 function descargaArchivo(id,url) {
     if(window.XMLHttpRequest) {
         peticionHttp = new XMLHttpRequest();
@@ -48,6 +51,7 @@ function descargaArchivo(id,url) {
             }
         }    
 }
+//Recoje el contenido del XML y lo almacena en variables
 function procesaContenido (seccion,documentoXml,id,guardo){
    var root = documentoXml.getElementsByTagName("channel")[0];
     var tope = root.getElementsByTagName("item").length;
@@ -67,9 +71,9 @@ function procesaContenido (seccion,documentoXml,id,guardo){
                 url = item.getElementsByTagName("enclosure")[0].getAttribute('url');
             }
             catch(err) {
-                url = "images/error.png";
+                url = "../images/error.png";
             }
-               
+            //Crea el objeto para guardar en el array   
                var noticia = {
                 id: guid,
                 tituloN: titulo,
@@ -80,9 +84,11 @@ function procesaContenido (seccion,documentoXml,id,guardo){
             contentList.push(noticia);
     }    
         var noticiaAGuardar = JSON.stringify(contentList);
+        //Guarda el array de objetos en el localstorage
         localStorage.setItem(guardo, noticiaAGuardar);
         muestraHTML(seccion, noticiaAGuardar,id);       
 }
+//Modela los datos y los printa en html
 function muestraHTML(seccion, contentList,id){
         var types = JSON.parse(contentList);
         for(x=0; x<20; x++) {
@@ -91,8 +97,6 @@ function muestraHTML(seccion, contentList,id){
                 var descripcion=types[x].descripN;
                 var enlace=types[x].enlace;
                 var url = types[x].img;
-                /*  $('.pop').append('<div class="modal fade" id="myModal" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button><h4 class="modal-title" align="center">Estas seguro?</h4></div><div class="modal-body" align="center"><button type="button" class="btn btn-default " data-dismiss="modal" onclick="alert('+ x +');">Si</button><button type="button" class="btn btn-default" data-dismiss="modal">No</button></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button></div></div></div></div>');*/
-         
                   $('#' + seccion).append("<div class='col-sm-12'><div class='col-sm-10 noticia'><b>" + titulo + "<br></b><div class='noticia1'>" + descripcion + "<div class='imagencita'><a href='" + enlace +"' target='_blank'><img class='leerMas' src='images/leer_mas.png'/></a></div></div></div><div class='col-sm-2'><img class='img-circle' src='" + url + "'/></div><a href='#' id='"+ideNoticia+"' class='linked' onclick='favorite("+id+","+x+",`"+ideNoticia+"`);'><div class='like'><div class='textoLike'><span class='glyphicon glyphicon-heart'></span> Añadir</div></div></a></div><br>");
                 
         }
@@ -100,7 +104,7 @@ function muestraHTML(seccion, contentList,id){
         var posicion = cache.indexOf(seccion);
         var cacheFavorite = localStorage.getItem(seccionFavorite[posicion]);
         var contentParse =  JSON.parse(cacheFavorite);
-        
+        //Comprueba si una noticia ha sido añadida a favoritos
         if(contentParse!=null){
             for(i=0;i<20;i++){
                 try{
@@ -115,9 +119,11 @@ function muestraHTML(seccion, contentList,id){
         }       
     }
 }
+//Redirige a la pagina que le pases por parametro
 function principal(url){
     $( location ).attr("href", url);
 }
+//Notificacion de error
 function error(seccion){
     var muestraNoticia = localStorage.getItem(seccion);
     if(muestraNoticia != null && muestraNoticia.length != 0){
@@ -127,6 +133,7 @@ function error(seccion){
         $("#" + seccion).html("<h4>Se ha producido un error,vaya a la configuracion de la pagina para resolverlo.</h4>");
     }
 }
+//Comprobaciones para permitir las notificaciones push "Locales"
 document.addEventListener('DOMContentLoaded', function () {
   if (Notification.permission !== "granted")
     Notification.requestPermission();
@@ -141,7 +148,7 @@ function welcome(mensaje) {
     Notification.requestPermission();
   else {
     var notification = new Notification('MyApp PWA', {
-      icon: 'myapp.png',
+      icon: '../images/myapp.png',
       body: mensaje,
     });
 
@@ -151,8 +158,8 @@ function welcome(mensaje) {
     
   }
 }
+//Añade una noticia al localstorage para luego tratarla como una noticia favorita
 function favorite(id,x,ideNoticia){
-    //VARIABLE PARA EL NOMBRE DEL LOCALSTORAGE
     var notiFavorita = seccionFavorite[id];
     var seccion = cache[id];
     var object = localStorage.getItem(seccion);
@@ -170,26 +177,36 @@ function favorite(id,x,ideNoticia){
         enlace:enlace,
         img: url
     };
+    //Obtiene el contenido de la cache
     var oldItems = JSON.parse(localStorage.getItem(notiFavorita)) || [];
     var comprueboCache  = localStorage.getItem(notiFavorita);
+    //Si hay contenido lo añade al array para guardarlo con el contenido nuevo
     if(comprueboCache != null){
         oldItems.push(noticia);
         localStorage.setItem(notiFavorita, JSON.stringify(oldItems));
+    //Si no hay contenido se guarda el contenido nuevo en el localstorage directamente
     }else{
         matFavoritas.push(noticia);
         var noticiaAGuardar = JSON.stringify(matFavoritas);
         localStorage.setItem(notiFavorita,noticiaAGuardar);
     }
 }
+//Muestra las noticias favoritas 
 function mostrarFavoritos(){
+    //Recorre las 5 secciones posibles para añadir a favoritas
     for(var x=0;x<5;x++){
         var muestraNoticia = localStorage.getItem(seccionFavorite[x]);
+        //Si la seccion no es nula lee todo su contenido
         if(muestraNoticia!=null && muestraNoticia.length != 0){
              for(i=0;i<1;i++){
+             //Vuelve a comprobar que no sea nula la informacion
              if(muestraNoticia != null && muestraNoticia.length != 0){
+                    //Parsea los objetos JSON
                     var seccion = seccionFavorite[x];
                     var types = JSON.parse(muestraNoticia);
+                    //Los almacena en variables y los muestra
                     for(z=0;z<20;z++){
+                        //En el caso que no encuentre noticia saltara un error y entonces se rompera el bucle
                         try{
                             var id = types[z].id;
                             var titulo = types[z].tituloN;
@@ -203,21 +220,26 @@ function mostrarFavoritos(){
                     }
                 }
             }
+        //Va sumando al contador si las secciones de favoritas son nulas
         }else{
             contador++;
         }
     }
+    //En el caso que el contador llegue a 5 salta una notificación y entiende que todas las secciones son nulas
     if(contador == 5){
-        //$( "body" ).append("<h4>No hay noticias añadidas a favoritos</h4>");
         $('#myModal').modal('show');
     }
 }
+//Elimina una noticia añadida a favoritas
 function removeFavorite(seccion,id){
+    //Obtiene el objeto de la cache
     var takeNoticia = JSON.parse(localStorage.getItem(seccion));
+    //Con el id pasado por parametro se borra la noticia
     takeNoticia.splice(id, 1);
     var noticiaAguardar = JSON.stringify(takeNoticia);
+    //Volvemos a guardar el contenido actualizado en cache
     localStorage.setItem(seccion,noticiaAguardar);
-    
+    //Si el registro no contiene nada se borra todo el registro de la cache
     if(takeNoticia.length == 0){
         localStorage.removeItem(seccion);
     }
