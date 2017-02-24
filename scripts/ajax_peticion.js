@@ -181,3 +181,20 @@ function error(seccion){
         $("#" + seccion).html("<h4>Se ha producido un error,vaya a la configuracion de la pagina para resolverlo.</h4>");
     }  
 }
+//Funcion que gestiona el panel de administración
+function adminPanel(id){
+    if(id==1){
+        localStorage.clear();
+    }else if(id==2){
+        var cookies = document.cookie.split(";");
+        
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i];
+            var eqPos = cookie.indexOf("=");
+            var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+            document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        }
+    }else if(id==3){
+        location.reload();
+    }
+}

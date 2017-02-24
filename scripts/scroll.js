@@ -1,4 +1,5 @@
-    $(document).ready(function(){
+//Efecto scroll hacia arriba
+$(document).ready(function(){
         $(window).scroll(function(){
             if ($(this).scrollTop() > 100) {
                 $('.scrollup').fadeIn();
