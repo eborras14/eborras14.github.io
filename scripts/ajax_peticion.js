@@ -113,6 +113,7 @@ function gestionaNoticias(sec,opc){
 }
 //Printa toda la informacion almacenada en los objetos y las formata en HTML
 function muestraHTML(seccion, contentList){
+    //COMPROVAR SI HAY COOKIE DE LA """"""""""""SESSION""""""""""""""""" CREADA I SI LA HAY NO MOSTRAR LOS DIV ISADMIN Y ADMINFOOTER
     var o = "pp";
     if (seccion != null && seccion.length != 0 && contentList != null && contentList.length != 0) {
         var idContainer = document.getElementById(seccion);
@@ -196,5 +197,71 @@ function adminPanel(id){
         }
     }else if(id==3){
         location.reload();
+    }else if(id==4){
+        var usuario = $("#usr").val();
+        var password = $("#pwd").val();
+        
+        //Comprueba si soporta Web SQL
+        if (window.openDatabase) {
+            //Creamos la base de datos  
+            var mydb = openDatabase("users_db", "0.1", "BBDD para administracion", 1024 * 1024);
+
+            //creamos la tabla
+            mydb.transaction(function (t) {
+                t.executeSql("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY ASC, usuario TEXT, password TEXT)");  
+            });
+            /*mydb.transaction(function (t) {
+                    t.executeSql("INSERT INTO users (usuario, password) VALUES (?, ?)", ["admin","admin"]);
+                    alert("INSERT OK");
+            });*/
+            if (mydb) {
+            //Comprabacion si tienen contenido
+               if (usuario !== "" && password !== "") {
+                    resultsDB(usuario,password);
+               } else {
+                    alert("Introduce usuario/contraseña");
+                }
+            }else {
+                    alert("Base de datos no soportada");
+            }
+        } else {
+            alert("WebSQL no soportado");
+        }
     }
+}
+function resultsDB(usuario,password){
+    var mydb = openDatabase("users_db", "0.1", "BBDD para administracion", 1024 * 1024);
+        if (mydb) {
+            mydb.transaction(function (t) {
+                t.executeSql("SELECT * FROM users", [], function(transaction, result){
+                                                        for (var i=0; i < result.rows.length; i++) { 
+                                                            var row = result.rows.item(i);
+                                                            if(row.usuario!="" && row.password !=""){
+                                                                if(row.usuario==usuario && row.password==password){
+                                                                    //CREAR COOKIE PARA SABER QUE HEMOS INICIADO SESSION CORRECTAMENTE PERO SOLAMENTE QUE DURE DURANTE LA SESSION DEL NAVEGADOR ACTUAL AL CERRARLO SE BORRE LA COOKIE
+                                                                    $("#isAdmin").css({"display": "initial"});
+                                                                    $("#adminFooter").css({"display": "inherit"});
+                                                                    $("#isLogin").css({"display": "none"});
+                                                                    
+                                                                }else{
+                                                                    if(row.password!=password){
+                                                                        $("#contraseña").removeClass( "form-group" ).addClass( "form-group has-error has-feedback" );
+                                                                        $("#contraseña").append('<span class="glyphicon glyphicon-remove form-control-feedback"></span>');
+                                                                        $("#pwd").val("");
+                                                                    }
+                                                                    if(row.usuario!=usuario){
+                                                                        $("#usuario").removeClass( "form-group" ).addClass( "form-group has-error has-feedback" );
+                                                                        $("#usuario").append('<span class="glyphicon glyphicon-remove form-control-feedback"></span>');
+                                                                        $("#usr").val("Usuario incorrecto");
+                                                                    }
+                                                                    
+                                                                }
+                                                            }
+                                                        }
+                                                        });
+            });
+         
+        }else {
+            alert("Error al acceder a la base de datos");
+        }
 }

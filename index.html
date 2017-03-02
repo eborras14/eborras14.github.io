@@ -105,24 +105,25 @@
           <h4 class="modal-title">Administración</h4>
         </div>
         <div class="modal-body">
+            <!--Ocultar con el CSS-->
             <div id="isAdmin">
                 <button onclick="adminPanel(1);" type="button" class="btn btn-default btn-lg btn-block">Eliminar cache</button>
                 <button onclick="adminPanel(2);" type="button" class="btn btn-default btn-lg btn-block">Eliminar cookies</button>
             </div>
             <div id="isLogin">
-            
-                <div class="form-group">
+                <div class="form-group" id="usuario">
                     <label for="usr">Usuario:</label>
                     <input type="text" class="form-control" id="usr">
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="contraseña">
                     <label for="pwd">Contraseña:</label>
                     <input type="password" class="form-control" id="pwd">
                 </div>
-                <button type="submit" class="btn btn-default">Entrar</button>
+                <button type="submit" class="btn btn-default" onclick="adminPanel(4);">Entrar</button>
             </div>
         </div>
-        <div class="modal-footer">
+        <!--Ocultar con el CSS ------>
+        <div class="modal-footer" id="adminFooter">
           <button onclick="adminPanel(3);" type="button" class="btn btn-default" data-dismiss="modal">Aceptar</button>
         </div>
       </div>
