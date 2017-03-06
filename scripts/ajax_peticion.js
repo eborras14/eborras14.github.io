@@ -1,4 +1,71 @@
+    $(document).ready(function(){
+    //Funcion que comprueba si hay conexion a internet si la hay muestra contenido de internet sino muestra contenido de cache si esque hay
+    status = navigator.onLine;
+      if(status=="true"){
+          for(i=0;i<div.length;i++){
+            seccion=div[i];
+            var muestraNoticia = localStorage.getItem(seccion);
+            if(muestraNoticia != null && muestraNoticia.length != 0){
+                document.getElementById(i).disabled = true;
+                muestraHTML(seccion, muestraNoticia);
+            }
+        }
+        }else if(status=="false"){
+        welcome("Sin conexion");
+         $(".enabledDisabled").hide();
+          $(".subscription-details").hide();
+
+         for(i=0;i<div.length;i++){
+            seccion=div[i];
+            var muestraNoticia = localStorage.getItem(seccion);
+            if(muestraNoticia!=null){
+                document.getElementById(i).disabled = true;
+                muestraHTML(seccion, muestraNoticia);
+            }
+        }              
+      }
+//Popover de cada seccion-----------------------------
+    $('[data-toggle="popover"]').popover();  
+//---------------Facebook ---------------------------
+(function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "https://connect.facebook.net/es_ES/sdk.js#xfbml=1&version=v2.8&appId=351755105201498";
+	  fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));
+//TWITTER --------------------------------------
+    window.twttr = (function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0],
+    t = window.twttr || {};
+  if (d.getElementById(id)) return t;
+  js = d.createElement(s);
+  js.id = id;
+  js.src = "https://platform.twitter.com/widgets.js";
+  fjs.parentNode.insertBefore(js, fjs);
+
+  t._e = [];
+  t.ready = function(f) {
+    t._e.push(f);
+  };
+  return t;
+}(document, "script", "twitter-wjs"));
+        
 comprovarPop();
+        
+//Comprovamos si esta la session iniciada
+var x = document.cookie;
+var n = x.search("session=true");
+var str = x.slice(n, x.length);
+if(str=="session=true"){
+        $("#isAdmin").css({"display": "initial"});
+        $("#adminFooter").css({"display": "inherit"});
+        $("#isLogin").css({"display": "none"});     
+}
+
+});
+ 
+
 //Comprobación si hay cookie creada, para saber si es la primera vez que entras
 function comprovarPop(){
     var x=document.cookie;
@@ -113,8 +180,6 @@ function gestionaNoticias(sec,opc){
 }
 //Printa toda la informacion almacenada en los objetos y las formata en HTML
 function muestraHTML(seccion, contentList){
-    //COMPROVAR SI HAY COOKIE DE LA """"""""""""SESSION""""""""""""""""" CREADA I SI LA HAY NO MOSTRAR LOS DIV ISADMIN Y ADMINFOOTER
-    var o = "pp";
     if (seccion != null && seccion.length != 0 && contentList != null && contentList.length != 0) {
         var idContainer = document.getElementById(seccion);
         if (idContainer != null) {
@@ -210,25 +275,44 @@ function adminPanel(id){
             mydb.transaction(function (t) {
                 t.executeSql("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY ASC, usuario TEXT, password TEXT)");  
             });
-            /*mydb.transaction(function (t) {
-                    t.executeSql("INSERT INTO users (usuario, password) VALUES (?, ?)", ["admin","admin"]);
-                    alert("INSERT OK");
-            });*/
             if (mydb) {
-            //Comprabacion si tienen contenido
-               if (usuario !== "" && password !== "") {
-                    resultsDB(usuario,password);
-               } else {
-                    alert("Introduce usuario/contraseña");
-                }
+                //Comprueba si hay usuarios en la BBDD
+                  mydb.transaction(function (t) {
+                    t.executeSql("SELECT count(*) as contador FROM users", [], function(transaction, result){
+                        var row = result.rows.item(0);
+                        var filas = row.contador;
+                        filas = parseInt(filas);
+                        if(filas==0){
+                            mydb.transaction(function (t) {
+                                t.executeSql("INSERT INTO users (usuario, password) VALUES (?, ?)", ["admin","admin"]);
+                                console.log("INSERT OK");
+                                resultsDB(usuario,password);
+                            });  
+                        }else{
+                            //Comprabacion si tienen contenido
+                            if (usuario !== "" && password !== "") {
+                                resultsDB(usuario,password);
+                            } else {
+                                alert("Introduce usuario/contraseña");
+                            } 
+                        }
+                         
+                    });
+            });
             }else {
                     alert("Base de datos no soportada");
             }
         } else {
             alert("WebSQL no soportado");
         }
+    }else if(id==5){
+        document.cookie = "session=false;";
+        $("#isAdmin").css({"display": "none"});
+        $("#adminFooter").css({"display": "none"});
+        $("#isLogin").css({"display": "inherit"});
     }
 }
+//Comprueba si el usuario que ha hecho login es el mismo que el de la BBDD
 function resultsDB(usuario,password){
     var mydb = openDatabase("users_db", "0.1", "BBDD para administracion", 1024 * 1024);
         if (mydb) {
@@ -238,22 +322,24 @@ function resultsDB(usuario,password){
                                                             var row = result.rows.item(i);
                                                             if(row.usuario!="" && row.password !=""){
                                                                 if(row.usuario==usuario && row.password==password){
-                                                                    //CREAR COOKIE PARA SABER QUE HEMOS INICIADO SESSION CORRECTAMENTE PERO SOLAMENTE QUE DURE DURANTE LA SESSION DEL NAVEGADOR ACTUAL AL CERRARLO SE BORRE LA COOKIE
                                                                     $("#isAdmin").css({"display": "initial"});
                                                                     $("#adminFooter").css({"display": "inherit"});
                                                                     $("#isLogin").css({"display": "none"});
+                                                                    $("#contraseña").removeClass( "form-group has-error has-feedback" ).addClass( "form-group" );
+                                                                    $("#usuario").removeClass( "form-group has-error has-feedback" ).addClass( "form-group" );
+                                                                    document.cookie = "session=true";
                                                                     
-                                                                }else{
-                                                                    if(row.password!=password){
-                                                                        $("#contraseña").removeClass( "form-group" ).addClass( "form-group has-error has-feedback" );
-                                                                        $("#contraseña").append('<span class="glyphicon glyphicon-remove form-control-feedback"></span>');
-                                                                        $("#pwd").val("");
-                                                                    }
-                                                                    if(row.usuario!=usuario){
-                                                                        $("#usuario").removeClass( "form-group" ).addClass( "form-group has-error has-feedback" );
-                                                                        $("#usuario").append('<span class="glyphicon glyphicon-remove form-control-feedback"></span>');
-                                                                        $("#usr").val("Usuario incorrecto");
-                                                                    }
+                                                                    }else{
+                                                                        if(row.password!=password){
+                                                                            $("#contraseña").removeClass( "form-group" ).addClass( "form-group has-error has-feedback" );
+                                                                            $("#pwd").val("");
+                                                                            $("#pwd").attr("placeholder", "Contraseña incorrecta");
+                                                                        }   
+                                                                        if(row.usuario!=usuario){
+                                                                            $("#usuario").removeClass( "form-group" ).addClass( "form-group has-error has-feedback" );
+                                                                            $("#usr").val("");
+                                                                            $("#usr").attr("placeholder", "Usuario incorrecto");
+                                                                        }
                                                                     
                                                                 }
                                                             }
